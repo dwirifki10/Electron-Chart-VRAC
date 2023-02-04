@@ -5,6 +5,7 @@
 const { SerialPort }  = require('serialport');
 const { ReadlineParser } = require('@serialport/parser-readline');
 const tableify = require('tableify');
+const fs = require('fs').promises;
 
 async function listSerialPorts() {
   await SerialPort.list().then((ports, err) => {
@@ -38,6 +39,21 @@ listSerialPorts();
 
 let labels = [];
 
+async function createTxt(obj) {
+  try{
+    await fs.appendFile(`/Log/Log - ${new Date().toDateString()}.txt`, `${JSON.stringify(obj)},`, (error) => {
+    if(error) throw error;
+      document.getElementById('val').classList.add('text-success');
+      document.getElementById('val').classList.remove('text-remove');
+      document.getElementById('val').innerHTML = 'successfully write to a file';
+    })
+  }catch(error) {
+      document.getElementById('val').classList.add('text-danger');
+      document.getElementById('val').classList.remove('text-success');
+      document.getElementById('val').innerHTML = `Got an error trying to write to a file: ${error.message}`;
+  }
+}
+
 function collectData() {
   let port = document.getElementById('port').value;
   let rate = document.getElementById('rate').value;
@@ -67,6 +83,7 @@ function collectData() {
       dataSecond.data.push(obj["current set point"]);
       labels.push("Trial " + obj["trial"]);
     }
+    createTxt(obj);
     array = [obj];
     tableData = tableify(array)
     document.getElementById('result').innerHTML = tableData;
@@ -77,6 +94,8 @@ function collectData() {
     }
   });  
 }
+
+setInterval(collectData(), 60000);
 
 let ctx = document.getElementById('myChart').getContext('2d');
 
