@@ -7,6 +7,8 @@ const { ReadlineParser } = require('@serialport/parser-readline');
 const tableify = require('tableify');
 const fs = require('fs').promises;
 
+const { ipcRenderer } = require('electron');
+
 async function listSerialPorts() {
   await SerialPort.list().then((ports, err) => {
     if(err) {
@@ -54,21 +56,27 @@ async function createTxt(obj) {
   }
 }
 
-function collectData() {
+function collectData(param) {
   let port = document.getElementById('port').value;
   let rate = document.getElementById('rate').value;
 
   console.log(port, rate);
-  const res = new SerialPort({path: port, baudRate: parseInt(rate)});
+  document.getElementById('session').value = param;
+  let res = new SerialPort({path: port, baudRate: parseInt(rate)});
+
+  if(param == 0) { 
+    ipcRenderer.send('relaunch');
+  }
 
   res.on('error', (err) => {
     if(err) {
+      console.log(err);
       document.getElementById('val').classList.add('text-danger');
       document.getElementById('val').classList.remove('text-success');
       document.getElementById('val').innerHTML = "an error occured : " + err
       return;
-    } 
-  })
+    }
+  });
 
   const parser = res.pipe(new ReadlineParser({ delimiter: '\r\n' }));
   parser.on('data', (data) => {
@@ -90,12 +98,14 @@ function collectData() {
     if (document.getElementById('result').childNodes.length !== 0) {
         document.getElementById('val').classList.add('text-success');
         document.getElementById('val').classList.remove('text-danger');
+        document.getElementById('connected').classList.add("d-none");
+        document.getElementById('disconnected').classList.remove("d-none");
         document.getElementById('val').innerHTML = "connected successfully";
     }
   });  
 }
 
-setInterval(collectData(), 60000);
+// setInterval(collectData(1), 60000);
 
 let ctx = document.getElementById('myChart').getContext('2d');
 

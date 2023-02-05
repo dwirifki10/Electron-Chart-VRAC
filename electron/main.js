@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { ipcMain, app, BrowserWindow } = require('electron')
 const path = require('path')
 const url = require('url')
 
@@ -37,6 +37,11 @@ function createWindow() {
         mainWindow = null
     })
 }
+
+ipcMain.on('relaunch', (evt, arg) => {
+    app.relaunch();
+    app.exit(0);
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
