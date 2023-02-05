@@ -1,5 +1,5 @@
 {
-  "name": "electron-serialport",
+  "name": "ChartVRAC",
   "version": "1.0.2",
   "description": "A minimal Electron application with node serialport",
   "main": "main.js",
