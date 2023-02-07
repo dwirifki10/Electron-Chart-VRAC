@@ -56,6 +56,63 @@ async function createTxt(obj) {
   }
 }
 
+function sendData() {
+  let PWM = document.getElementById('PWM').value;
+  let port = document.getElementById('port').value;
+  let rate = document.getElementById('rate').value;
+  
+  console.log(PWM, port, rate);
+  let res = new SerialPort({path: port, baudRate: parseInt(rate)});
+  res.write(PWM.toString(), (err) => {
+    if(err) {
+      document.getElementById('val').innerHTML = "error occured : " + err;
+      document.getElementById('val').classList.add('text-danger');
+      document.getElementById('val').classList.remove('text-success');
+      console.log(err);
+    }
+    document.getElementById('val').innerHTML = "successfully write data";
+    document.getElementById('val').classList.add('text-success');
+    document.getElementById('val').classList.remove('text-danger');
+  });
+
+  res.on('error', (err) => {
+    if(err) {
+      console.log(err);
+      document.getElementById('val').classList.add('text-danger');
+      document.getElementById('val').classList.remove('text-success');
+      document.getElementById('val').innerHTML = "an error occured : " + err
+      return;
+    }
+  });
+
+  const parser = res.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+  parser.on('data', (data) => {
+    data = data.toString().split("\t");
+    obj = {};
+    for (let i = 0; i < data.length; i++) {
+      let keyValue = data[i].split(" : ");
+      obj[keyValue[0]] = keyValue[1];
+    }
+    if(obj["trial"] != undefined) {
+      dataFirst.data.push(obj["RPM"]);
+      dataSecond.data.push(obj["current set point"]);
+      labels.push(obj["trial"]);
+    }
+    createTxt(obj);
+    array = [obj];
+    tableData = tableify(array)
+    document.getElementById('result').innerHTML = tableData;
+    if (document.getElementById('result').childNodes.length !== 0) {
+        document.getElementById('val').classList.add('text-success');
+        document.getElementById('val').classList.remove('text-danger');
+        document.getElementById('connected').classList.add("d-none");
+        document.getElementById('reset').classList.add("d-none");
+        document.getElementById('disconnected').classList.remove("d-none");
+        document.getElementById('val').innerHTML = "connected successfully";
+    }
+  });  
+}
+
 function collectData(param) {
   let port = document.getElementById('port').value;
   let rate = document.getElementById('rate').value;
@@ -89,7 +146,7 @@ function collectData(param) {
     if(obj["trial"] != undefined) {
       dataFirst.data.push(obj["RPM"]);
       dataSecond.data.push(obj["current set point"]);
-      labels.push("Trial " + obj["trial"]);
+      labels.push(obj["trial"]);
     }
     createTxt(obj);
     array = [obj];
@@ -99,6 +156,7 @@ function collectData(param) {
         document.getElementById('val').classList.add('text-success');
         document.getElementById('val').classList.remove('text-danger');
         document.getElementById('connected').classList.add("d-none");
+        document.getElementById('reset').classList.add("d-none");
         document.getElementById('disconnected').classList.remove("d-none");
         document.getElementById('val').innerHTML = "connected successfully";
     }
@@ -109,18 +167,20 @@ function collectData(param) {
 
 let ctx = document.getElementById('myChart').getContext('2d');
 
-setInterval(() => {
-  // check dataFirst is 10
-  if(dataFirst.data.length == 0) {
+async function saveData() {
+  var canvas = document.getElementById("myChart");
+  var dataURL = canvas.toDataURL("png/jpg");
+  await fs.writeFile(`/Log/Chart/Chart - ${new Date().toDateString() + " - " + Math.random().toString(36).substr(2, 9).toUpperCase()}.png`, dataURL.replace(/^data:image\/\w+;base64,/, ""), "base64", function(err) {
+    if (err) throw err;
+    console.log("File saved");
+  });
+  document.getElementById('myFile').innerHTML = "File Saved";
+  await setTimeout(() => {
+    document.getElementById('myFile').innerHTML = ""
+  }, 5000);
+}
 
-  }
-  if(dataFirst.data.length >= 12) {
-    setTimeout(() => {
-      labels = [];
-      dataFirst.data = [];
-      dataSecond.data = [];
-    }, 4500);
-  }
+setInterval(() => {
   // show chart
   let myChart = new Chart(ctx, {
     type: 'line',
