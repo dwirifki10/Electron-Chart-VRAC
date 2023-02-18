@@ -95,8 +95,10 @@ function sendData() {
     }
     if(obj["trial"] != undefined) {
       dataFirst.data.push(obj["RPM"]);
-      dataSecond.data.push(obj["current set point"]);
-      labels.push(obj["trial"]);
+      dataSecond.data.push(obj["Lower Threshold"]);
+      dataThird.data.push(obj["Upper Threshold"]);
+      dataFourth.data.push(obj["Level"]);
+      labels.push(obj["Trial"]);
     }
     createTxt(obj);
     array = [obj];
@@ -145,8 +147,10 @@ function collectData(param) {
     }
     if(obj["trial"] != undefined) {
       dataFirst.data.push(obj["RPM"]);
-      dataSecond.data.push(obj["current set point"]);
-      labels.push(obj["trial"]);
+      dataSecond.data.push(obj["Lower Threshold"]);
+      dataThird.data.push(obj["Upper Threshold"]);
+      dataFourth.data.push(obj["Level"]);
+      labels.push(obj["Trial"]);
     }
     createTxt(obj);
     array = [obj];

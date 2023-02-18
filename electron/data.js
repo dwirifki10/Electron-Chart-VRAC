@@ -6,11 +6,25 @@ let dataFirst = {
 	    borderColor: 'blue'
   	};
 let dataSecond = {
-	    label: "Set Point",
+	    label: "Lower Threshold",
 	    data: [],
 	    fill: false,
 	    backgroundColor : 'red',
 	  	borderColor: 'red'
+	};
+let dataThird = {
+		label: "Upper Threshold",
+		data: [],
+		fill: false,
+		backgroundColor: 'green',
+		borderColor: 'green'
+	};
+let dataFourth = {
+		label: "Load Level",
+		data: [],
+		fill: false,
+		backgroundColor: "yellow",
+		borderColor: "yellow"
 	};
 let options = {
 			legend: {
