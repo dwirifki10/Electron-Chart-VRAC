@@ -23,8 +23,8 @@ let dataFourth = {
 		label: "Load Level",
 		data: [],
 		fill: false,
-		backgroundColor: "yellow",
-		borderColor: "yellow"
+		backgroundColor: "orange",
+		borderColor: "orange"
 	};
 let options = {
 			legend: {

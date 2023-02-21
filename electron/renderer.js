@@ -190,7 +190,7 @@ setInterval(() => {
     type: 'line',
     data: {
       labels: labels,
-      datasets: [dataFirst, dataSecond],
+      datasets: [dataFirst, dataSecond, dataThird, dataFourth],
     },
     options: options
   });
