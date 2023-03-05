@@ -40,10 +40,11 @@ setTimeout(listPorts, 2000);
 listSerialPorts();
 
 let labels = [];
+let trial = null;
 
 async function createTxt(obj) {
   try{
-    await fs.appendFile(`/Log/Log - ${new Date().toDateString()}.txt`, `${JSON.stringify(obj)},`, (error) => {
+    await fs.appendFile(`/LOG/Log - ${new Date().toDateString()}.txt`, `${JSON.stringify(obj)},`, (error) => {
     if(error) throw error;
       document.getElementById('val').classList.add('text-success');
       document.getElementById('val').classList.remove('text-remove');
@@ -93,12 +94,23 @@ function sendData() {
       let keyValue = data[i].split(" : ");
       obj[keyValue[0]] = keyValue[1];
     }
-    if(obj["trial"] != undefined) {
+    if(obj["Trial"] != undefined) {
       dataFirst.data.push(obj["RPM"]);
       dataSecond.data.push(obj["Lower Threshold"]);
       dataThird.data.push(obj["Upper Threshold"]);
-      dataFourth.data.push(obj["Level"]);
-      labels.push(obj["Trial"]);
+      trial = obj["Trial"];
+    }
+    if(obj["Level"] != undefined) {
+      if(trial >= 4) {
+        dataFourth.data.push(obj["Level"]);
+        labels.push((parseInt(trial) + 1) * 30);
+      }else {
+        dataFourth.data.push(obj["Level"]);
+        labels.push((parseInt(trial) + 1) * 20);
+      }
+    }else {
+      dataFourth.data.push("");
+      labels.push("");
     }
     createTxt(obj);
     array = [obj];
@@ -145,12 +157,22 @@ function collectData(param) {
       let keyValue = data[i].split(" : ");
       obj[keyValue[0]] = keyValue[1];
     }
-    if(obj["trial"] != undefined) {
+    if(obj["Trial"] != undefined) {
       dataFirst.data.push(obj["RPM"]);
       dataSecond.data.push(obj["Lower Threshold"]);
       dataThird.data.push(obj["Upper Threshold"]);
+      trial = obj["Trial"];
+    }
+    if(obj["Level"] != undefined) {
       dataFourth.data.push(obj["Level"]);
-      labels.push(obj["Trial"]);
+      if(trial >= 4) {
+        labels.push((parseInt(trial) + 1) * 30);
+      }else {
+        labels.push((parseInt(trial) + 1) * 20);
+      }
+    }else {
+      dataFourth.data.push("");
+      labels.push("");
     }
     createTxt(obj);
     array = [obj];
@@ -170,11 +192,18 @@ function collectData(param) {
 // setInterval(collectData(1), 60000);
 
 let ctx = document.getElementById('myChart').getContext('2d');
+let ctg = document.getElementById('myGraph').getContext('2d');
 
 async function saveData() {
   var canvas = document.getElementById("myChart");
   var dataURL = canvas.toDataURL("png/jpg");
-  await fs.writeFile(`/Log/Chart/Chart - ${new Date().toDateString() + " - " + Math.random().toString(36).substr(2, 9).toUpperCase()}.png`, dataURL.replace(/^data:image\/\w+;base64,/, ""), "base64", function(err) {
+  var dataURL2 = document.getElementById("myGraph").toDataURL("png/jpg");
+  var dataName = new Date().toDateString() + " - " + Math.random().toString(36).substr(2, 9).toUpperCase();
+  await fs.writeFile(`/LOG/Chart/Chart - ${dataName}.png`, dataURL.replace(/^data:image\/\w+;base64,/, ""), "base64", function(err) {
+    if (err) throw err;
+    console.log("File saved");
+  });
+  await fs.writeFile(`/LOG/Chart/Chart2 - ${dataName}.png`, dataURL2.replace(/^data:image\/\w+;base64,/, ""), "base64", function(err) {
     if (err) throw err;
     console.log("File saved");
   });
@@ -190,8 +219,20 @@ setInterval(() => {
     type: 'line',
     data: {
       labels: labels,
-      datasets: [dataFirst, dataSecond, dataThird, dataFourth],
+      datasets: [dataFirst, dataThird, dataSecond],
     },
     options: options
   });
-}, 5000);
+}, 2000);
+
+setInterval(() => {
+  // show chart
+  let myGraph = new Chart(ctg, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [dataFourth]
+    },
+    options: options
+  })
+}, 2000);
