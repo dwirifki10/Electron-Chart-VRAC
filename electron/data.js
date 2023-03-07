@@ -39,13 +39,65 @@ let options = {
 					ticks: {
 					    fontFamily: "Poppins",
 					    fontStyle: "bold",
-					}
+					},
+					scaleLabel: {
+			          	display: true,
+			         	labelString: 'Times (x)',
+			         	fontColor: "blue",
+			         	fontStyle: "bold",
+			         	fontFamily: "Poppins"
+			        }
 				}],
 				yAxes: [{
 					ticks: {
 					    fontFamily: "Poppins",
 					    fontStyle: "bold",
-					}
+					},
+					scaleLabel: {
+			          	display: true,
+			         	labelString: 'RPM (y)',
+			         	fontColor: "blue",
+			         	fontStyle: "bold",
+			         	fontFamily: "Poppins"
+			        }
+				}],
+			},
+		};
+
+let options2 = {
+			legend: {
+				labels: {
+					fontColor: "grey",
+					fontStyle: "bold",
+					fontFamily: "Poppins"
+				}
+			},
+			scales: {
+				xAxes: [{
+					ticks: {
+					    fontFamily: "Poppins",
+					    fontStyle: "bold",
+					},
+					scaleLabel: {
+			          	display: true,
+			         	labelString: 'Times (x)',
+			         	fontColor: "blue",
+			         	fontStyle: "bold",
+			         	fontFamily: "Poppins"
+			        }
+				}],
+				yAxes: [{
+					ticks: {
+					    fontFamily: "Poppins",
+					    fontStyle: "bold",
+					},
+					scaleLabel: {
+			          	display: true,
+			         	labelString: 'Level (y)',
+			         	fontColor: "blue",
+			         	fontStyle: "bold",
+			         	fontFamily: "Poppins"
+			        }
 				}],
 			},
 		};

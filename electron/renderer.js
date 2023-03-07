@@ -41,6 +41,7 @@ listSerialPorts();
 
 let labels = [];
 let trial = null;
+let boolReset = true;
 
 async function createTxt(obj) {
   try{
@@ -101,7 +102,7 @@ function sendData() {
       trial = obj["Trial"];
     }
     if(obj["Level"] != undefined) {
-      if(trial >= 4) {
+      if(trial >= 4 && trial <= 10) {
         dataFourth.data.push(obj["Level"]);
         labels.push((parseInt(trial) + 1) * 30);
       }else {
@@ -165,7 +166,7 @@ function collectData(param) {
     }
     if(obj["Level"] != undefined) {
       dataFourth.data.push(obj["Level"]);
-      if(trial >= 4) {
+      if(trial >= 4 && trial <= 10) {
         labels.push((parseInt(trial) + 1) * 30);
       }else {
         labels.push((parseInt(trial) + 1) * 20);
@@ -211,10 +212,28 @@ async function saveData() {
   await setTimeout(() => {
     document.getElementById('myFile').innerHTML = ""
   }, 5000);
+} 
+
+async function resetChart() {
+  if(trial == 5 && boolReset == true) {
+    await saveData();
+    labels = [];
+    dataFirst.data = [];
+    dataSecond.data = [];
+    dataThird.data = [];
+    dataFourth.data = [];
+    boolReset = false;
+  }else if(trial == 11 && boolReset == false) {
+    await saveData();
+    boolReset = true;
+    collectData(0);
+  }
 }
+
 
 setInterval(() => {
   // show chart
+  resetChart();
   let myChart = new Chart(ctx, {
     type: 'line',
     data: {
@@ -223,16 +242,17 @@ setInterval(() => {
     },
     options: options
   });
-}, 2000);
+}, 3000);
 
 setInterval(() => {
   // show chart
+  resetChart();
   let myGraph = new Chart(ctg, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [dataFourth]
     },
-    options: options
+    options: options2
   })
-}, 2000);
+}, 3000);
